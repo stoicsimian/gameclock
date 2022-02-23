@@ -17,6 +17,11 @@ button = DigitalInOut(board.D2)
 button.direction = Direction.INPUT
 button.pull = Pull.UP
 
+# Digital input with pullup on D4
+button2 = DigitalInOut(board.D0)
+button2.direction = Direction.INPUT
+button2.pull = Pull.UP
+
 # NeoPixel strip (of 16 LEDs) connected on D4
 NUMPIXELS = 12
 neopixels = neopixel.NeoPixel(board.D4, NUMPIXELS, brightness=0.2, auto_write=False)
@@ -50,6 +55,7 @@ scorecolors = {200: GREEN,
                1600: PURPLE,
                3200: RED}
 nextgame=1
+mode="game"
 
 ######################### HELPERS ########################
 def clearring():
@@ -92,8 +98,23 @@ def drawgame():
         neopixels[lastchasepixel] = OFF
         neopixels.show()
 
-def buttonwait():
+def buttonhold():
     while not button.value: # This loop holds the progam in place while the button is pressed,
+    # print("The Button is still pressed")
+        pass # Using pass here because we don't need to do anything but need something in the while loop
+
+def buttonwait():
+    while button.value: # This loop holds the progam in place while the button is pressed,
+    # print("The Button is still pressed")
+        pass # Using pass here because we don't need to do anything but need something in the while loop
+
+def button2hold():
+    while not button2.value: # This loop holds the progam in place while the button is pressed,
+    # print("The Button is still pressed")
+        pass # Using pass here because we don't need to do anything but need something in the while loop
+
+def button2wait():
+    while button2.value: # This loop holds the progam in place while the button is pressed,
     # print("The Button is still pressed")
         pass # Using pass here because we don't need to do anything but need something in the while loop
 
@@ -111,46 +132,64 @@ time.sleep(1) # Give us a 1 second wait until we really get going
 ######################### MAIN LOOP ##############################
 
 while True:
-    for game in range(1,13):
-        print("This is the beginning of game ",game," the score is ",scores)
-        #displayscore()
-        clearring()
-        setstart()
-        nextgame=1
-        while nextgame > 0:
-            # Set the necessary pixels to the right colors
-            #print("Chasepixel is ", chasepixel, " and Lastpixel is ", lastchasepixel)
-            #print("Game is ",game," and nextgame is ",nextgame)
-            drawgame()
-            while delaycount > 0:
-                if not button.value:
-                    print("Button Pressed!")
-                    if chasepixel == basepixel:
-                        print("You did it !!!  Resetting the delay to ", startdelaycount)
-                        print("Adding the current delay count ",currentdelaycount,"to the score of",scores)
-                        scores.append(currentdelaycount)
-                        currentdelaycount = startdelaycount
-                        nextgame=0
-                        delaycount=0
-                        print("Value of nextgame is ,",nextgame)
-                    else:
-                        print(
-                            "You missed, slowing it down for you. Delay of ",
-                            delaycount,
-                            " will be doubled.",
-                        )
-                        currentdelaycount = currentdelaycount * 2
-                        delaycount = currentdelaycount
-                        print("Delaycount is now ", delaycount)
-                    # Hold the loop here until the button is no longer pressed
-                    buttonwait()
-                delaycount = (delaycount - 1)
-            #print("Delay Count is ",delaycount," currentdelaycount is ", currentdelaycount)
-            delaycount = currentdelaycount
-            lastchasepixel = chasepixel % NUMPIXELS
-            chasepixel = (chasepixel + 1) % NUMPIXELS
-            #time.sleep(delay)  # make bigger to slow down
-        clearring()
-        displayscore()
-        buttonwait()
+    while mode=="game":
+        for game in range(1,13):
+            print("This is the beginning of game ",game," the score is ",scores)
+            #displayscore()
+            clearring()
+            setstart()
+            nextgame=1
+            while nextgame > 0:
+                # Set the necessary pixels to the right colors
+                #print("Chasepixel is ", chasepixel, " and Lastpixel is ", lastchasepixel)
+                #print("Game is ",game," and nextgame is ",nextgame)
+                drawgame()
+                while delaycount > 0:
+                    if not button.value:
+                        print("Button Pressed!")
+                        if chasepixel == basepixel:
+                            print("You did it !!!  Resetting the delay to ", startdelaycount)
+                            print("Adding the current delay count ",currentdelaycount,"to the score of",scores)
+                            scores.append(currentdelaycount)
+                            currentdelaycount = startdelaycount
+                            nextgame=0
+                            delaycount=0
+                            print("Value of nextgame is ,",nextgame)
+                        else:
+                            print(
+                                "You missed, slowing it down for you. Delay of ",
+                                delaycount,
+                                " will be doubled.",
+                            )
+                            currentdelaycount = currentdelaycount * 2
+                            delaycount = currentdelaycount
+                            print("Delaycount is now ", delaycount)
+                        # Hold the loop here until the button is no longer pressed
+                        buttonhold()
+                    delaycount = (delaycount - 1)
+                    if not button2.value:
+                        print("Button 2 has been pressed")
+                        mode="clock"
+                        break
+                        button2wait()
+                        button2hold()
+                #print("Delay Count is ",delaycount," currentdelaycount is ", currentdelaycount)
+                delaycount = currentdelaycount
+                lastchasepixel = chasepixel % NUMPIXELS
+                chasepixel = (chasepixel + 1) % NUMPIXELS
+                if mode == "clock":
+                    break
+                #time.sleep(delay)  # make bigger to slow down
+            if mode == "clock":
+                    break
+            clearring()
+            displayscore()
+            buttonwait() #This holds the score on the screen until the button is pressed instead of having to wait some number of seconds
+            buttonhold() #This prevents an early button read after clearing the score
     scores.clear()
+    while mode=="clock":
+        print("This is the clock mode and will sit here until we put more in here")
+        clearring()
+        buttonwait()
+        buttonhold()
+        mode="game"
