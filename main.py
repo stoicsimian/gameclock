@@ -73,7 +73,7 @@ def displayscore():
         neopixels[pixel] = pcolor
         neopixels.show()
         pixel=(pixel + 1)
-    time.sleep(5)
+    #time.sleep(5)  
 
 def drawgame():
     if chasepixel == basepixel:
