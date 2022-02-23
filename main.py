@@ -30,10 +30,6 @@ BLUE = (0, 0, 255)
 PURPLE = (180, 0, 255)
 OFF = (0, 0, 0)
 
-i = 0
-# How many colors to jump per cycle
-jump = 22
-
 # How many cycles will the color sit on a single color
 basepixel = 0
 basecolor = GREEN
@@ -51,8 +47,8 @@ scores=[] # the empty array to hold the scores
 scorecolors = {200: GREEN,
                400: BLUE,
                800: YELLOW,
-               1600: RED,
-               3200: CYAN}
+               1600: PURPLE,
+               3200: RED}
 nextgame=1
 
 ######################### HELPERS ########################
@@ -70,7 +66,10 @@ def setstart():
 def displayscore():
     pixel=0
     for p in scores:
-        pcolor=scorecolors[p]
+        if p > 3200:
+            pcolor=RED
+        else:
+            pcolor=scorecolors[p]
         neopixels[pixel] = pcolor
         neopixels.show()
         pixel=(pixel + 1)
@@ -121,6 +120,7 @@ while True:
                     print("Button Pressed!")
                     if chasepixel == basepixel:
                         print("You did it !!!  Resetting the delay to ", startdelaycount)
+                        print("Adding the current delay count ",currentdelaycount,"to the score of",scores)
                         scores.append(currentdelaycount)
                         currentdelaycount = startdelaycount
                         nextgame=0
