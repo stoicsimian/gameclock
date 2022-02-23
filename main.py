@@ -92,6 +92,11 @@ def drawgame():
         neopixels[lastchasepixel] = OFF
         neopixels.show()
 
+def buttonwait():
+    while not button.value: # This loop holds the progam in place while the button is pressed,
+    # print("The Button is still pressed")
+    pass # Using pass here because we don't need to do anything but need something in the while loop
+
 ######################### SET START STATE ########################
 
 # turn off the LED on the board
@@ -138,10 +143,7 @@ while True:
                         delaycount = currentdelaycount
                         print("Delaycount is now ", delaycount)
                     # Hold the loop here until the button is no longer pressed
-                    while not button.value: # This loop holds the progam in place while the button is pressed,
-                        # print("The Button is still pressed")
-                        #time.sleep(0.1)
-                        pass # Using pass here because we don't need to do anything but need something in the while loop
+                    buttonwait()
                 delaycount = (delaycount - 1)
             #print("Delay Count is ",delaycount," currentdelaycount is ", currentdelaycount)
             delaycount = currentdelaycount
@@ -150,4 +152,5 @@ while True:
             #time.sleep(delay)  # make bigger to slow down
         clearring()
         displayscore()
+        buttonwait()
     scores.clear()
