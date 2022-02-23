@@ -95,7 +95,7 @@ def drawgame():
 def buttonwait():
     while not button.value: # This loop holds the progam in place while the button is pressed,
     # print("The Button is still pressed")
-    pass # Using pass here because we don't need to do anything but need something in the while loop
+        pass # Using pass here because we don't need to do anything but need something in the while loop
 
 ######################### SET START STATE ########################
 
