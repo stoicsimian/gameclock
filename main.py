@@ -74,6 +74,24 @@ def displayscore():
         neopixels.show()
         pixel=(pixel + 1)
     time.sleep(5)
+
+def drawgame():
+    if chasepixel == basepixel:
+        neopixels[basepixel] = bothcolor
+        neopixels[lastchasepixel] = OFF
+        neopixels.show()
+        #print("Delay Count is ",delaycount," currentdelaycount is ", currentdelaycount,"Game is ",game," and score is ", scores)
+    elif lastchasepixel == basepixel:
+        neopixels[basepixel] = basecolor
+        neopixels[chasepixel] = chasecolor
+        neopixels.show()
+    else:
+        # print("Time to set the other stuff")
+        neopixels[chasepixel] = chasecolor
+        # neopixels.show()
+        neopixels[lastchasepixel] = OFF
+        neopixels.show()
+
 ######################### SET START STATE ########################
 
 # turn off the LED on the board
@@ -88,11 +106,9 @@ time.sleep(1) # Give us a 1 second wait until we really get going
 ######################### MAIN LOOP ##############################
 
 while True:
-    for game in range(1,12):
+    for game in range(1,13):
         print("This is the beginning of game ",game," the score is ",scores)
         #displayscore()
-        clearring()
-        displayscore()
         clearring()
         setstart()
         nextgame=1
@@ -100,21 +116,7 @@ while True:
             # Set the necessary pixels to the right colors
             #print("Chasepixel is ", chasepixel, " and Lastpixel is ", lastchasepixel)
             #print("Game is ",game," and nextgame is ",nextgame)
-            if chasepixel == basepixel:
-                neopixels[basepixel] = bothcolor
-                neopixels[lastchasepixel] = OFF
-                neopixels.show()
-                #print("Delay Count is ",delaycount," currentdelaycount is ", currentdelaycount,"Game is ",game," and score is ", scores)
-            elif lastchasepixel == basepixel:
-                neopixels[basepixel] = basecolor
-                neopixels[chasepixel] = chasecolor
-                neopixels.show()
-            else:
-                # print("Time to set the other stuff")
-                neopixels[chasepixel] = chasecolor
-                # neopixels.show()
-                neopixels[lastchasepixel] = OFF
-                neopixels.show()
+            drawgame()
             while delaycount > 0:
                 if not button.value:
                     print("Button Pressed!")
@@ -124,6 +126,7 @@ while True:
                         scores.append(currentdelaycount)
                         currentdelaycount = startdelaycount
                         nextgame=0
+                        delaycount=0
                         print("Value of nextgame is ,",nextgame)
                     else:
                         print(
@@ -135,7 +138,7 @@ while True:
                         delaycount = currentdelaycount
                         print("Delaycount is now ", delaycount)
                     # Hold the loop here until the button is no longer pressed
-                    while not button.value:
+                    while not button.value: # This loop holds the progam in place while the button is pressed,
                         # print("The Button is still pressed")
                         #time.sleep(0.1)
                         pass # Using pass here because we don't need to do anything but need something in the while loop
@@ -145,4 +148,6 @@ while True:
             lastchasepixel = chasepixel % NUMPIXELS
             chasepixel = (chasepixel + 1) % NUMPIXELS
             #time.sleep(delay)  # make bigger to slow down
+        clearring()
+        displayscore()
     scores.clear()
