@@ -1,6 +1,6 @@
 # Trinket IO demo
 # Welcome to CircuitPython 3.1.1 :)
-# By Joshua & Joe (dad) Gardner :)
+# Games and Clock By Joshua & Joe (dad) Gardner :)
 
 import board
 from digitalio import DigitalInOut, Direction, Pull
@@ -186,7 +186,7 @@ while True:
             displayscore()
             buttonwait() #This holds the score on the screen until the button is pressed instead of having to wait some number of seconds
             buttonhold() #This prevents an early button read after clearing the score
-    scores.clear()
+        scores.clear()
     while mode=="clock":
         print("This is the clock mode and will sit here until we put more in here")
         clearring()
