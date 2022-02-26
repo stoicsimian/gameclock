@@ -23,7 +23,7 @@ button2.direction = Direction.INPUT
 button2.pull = Pull.UP
 
 # NeoPixel strip (of 16 LEDs) connected on D4
-NUMPIXELS = 12
+NUMPIXELS = 36
 neopixels = neopixel.NeoPixel(board.D4, NUMPIXELS, brightness=0.2, auto_write=False)
 
 ######################### SOME HELPFUL VALUES ####################
@@ -170,9 +170,8 @@ while True:
                     if not button2.value:
                         print("Button 2 has been pressed")
                         mode="clock"
-                        break
-                        button2wait()
                         button2hold()
+                        break
                 #print("Delay Count is ",delaycount," currentdelaycount is ", currentdelaycount)
                 delaycount = currentdelaycount
                 lastchasepixel = chasepixel % NUMPIXELS
@@ -190,6 +189,44 @@ while True:
     while mode=="clock":
         print("This is the clock mode and will sit here until we put more in here")
         clearring()
-        buttonwait()
-        buttonhold()
-        mode="game"
+        button2wait()
+        button2hold()
+        mode="timer"
+    while mode =="timer":
+        print("This is timer mode and will sit here until we put more in here")
+        clearring()
+        timerstart=int(time.monotonic())
+        lasttime=int(time.monotonic())
+        thistime=int(time.monotonic())
+        #neopixels[basepixel] = basecolor # Set Pixel 0 to green as a starting place
+        #neopixels.show()
+        secondspixel=0
+        timercolors = [GREEN, BLUE, YELLOW, PURPLE, RED]
+        for tcolor in timercolors:
+            print("Starting with color ",tcolor)
+            while True:
+                thistime=int(time.monotonic())
+                duration=thistime - lasttime
+                #print("This Time is ",thistime,"which is ",duration,"since the Last Time, which was ",lasttime)
+                if duration == 1:
+                    secondspixel = (secondspixel + 1) % NUMPIXELS
+                    print("The Seconds Pixel is ",secondspixel)
+                    neopixels[secondspixel] = tcolor
+                    neopixels.show()
+                    if secondspixel == 0:
+                        lasttime = thistime
+                        break
+                lasttime = thistime
+                if not button2.value:
+                    print("Button 2 has been pressed")
+                    mode="game"
+                    button2hold()
+                    break               
+            if mode == "game":
+                break
+        if mode == "game":
+            break
+        print("All done with the timer waiting to see a button push")
+        timerstop = int(time.monotonic())
+        timerduration = timerstop - timerstart
+        print("The timer ran for ",timerduration,"seconds.")
