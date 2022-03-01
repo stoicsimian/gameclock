@@ -235,6 +235,7 @@ while True:
                             button2hold()
                             break               
                     if mode == "game":
+                        clearring()
                         break
                 if mode == "game":
                     break
