@@ -22,9 +22,12 @@ button2 = DigitalInOut(board.D0)
 button2.direction = Direction.INPUT
 button2.pull = Pull.UP
 
-# NeoPixel strip (of 16 LEDs) connected on D4
+# NeoPixel rings (of 12 and 24 LEDs) connected on D4
 NUMPIXELS = 36
-neopixels = neopixel.NeoPixel(board.D4, NUMPIXELS, brightness=0.2, auto_write=False)
+neopixels = neopixel.NeoPixel(board.D4, NUMPIXELS, brightness=0.05, auto_write=False)
+
+ring1 = 12
+ring2 = 24
 
 ######################### SOME HELPFUL VALUES ####################
 RED = (255, 0, 0)
@@ -63,6 +66,11 @@ def clearring():
         neopixels[p] = (0, 0, 0)
     neopixels.show()
 
+def clearring1():
+    for p in range(ring1):
+        neopixels[p] = (0, 0, 0)
+    neopixels.show()
+
 def setstart():
     neopixels[basepixel] = basecolor # Set Pixel 0 to green as a starting place
     neopixels.show()
@@ -76,9 +84,10 @@ def displayscore():
             pcolor=RED
         else:
             pcolor=scorecolors[p]
-        neopixels[pixel] = pcolor
-        neopixels.show()
+        scorepixel = pixel + (ring1 )
+        neopixels[scorepixel] = pcolor
         pixel=(pixel + 1)
+    neopixels.show()
     #time.sleep(5)  
 
 def drawgame():
@@ -133,10 +142,10 @@ time.sleep(1) # Give us a 1 second wait until we really get going
 
 while True:
     while mode=="game":
-        for game in range(1,13):
+        for game in range(1,25):
             print("This is the beginning of game ",game," the score is ",scores)
             #displayscore()
-            clearring()
+            clearring1()
             setstart()
             nextgame=1
             while nextgame > 0:
@@ -174,18 +183,18 @@ while True:
                         break
                 #print("Delay Count is ",delaycount," currentdelaycount is ", currentdelaycount)
                 delaycount = currentdelaycount
-                lastchasepixel = chasepixel % NUMPIXELS
-                chasepixel = (chasepixel + 1) % NUMPIXELS
+                lastchasepixel = chasepixel % ring1
+                chasepixel = (chasepixel + 1) % ring1
                 if mode == "clock":
                     break
                 #time.sleep(delay)  # make bigger to slow down
             if mode == "clock":
                     break
-            clearring()
             displayscore()
             buttonwait() #This holds the score on the screen until the button is pressed instead of having to wait some number of seconds
             buttonhold() #This prevents an early button read after clearing the score
         scores.clear()
+        clearring()
     while mode=="clock":
         print("This is the clock mode and will sit here until we put more in here")
         clearring()
@@ -193,7 +202,7 @@ while True:
         button2hold()
         mode="timer"
     while mode =="timer":
-        print("This is timer mode and will sit here until we put more in here")
+        print("This is timer mode we will count seconds on the small ring, through all colors then minutes on the big ring, up to 24.")
         clearring()
         timerstart=int(time.monotonic())
         lasttime=int(time.monotonic())
@@ -201,27 +210,38 @@ while True:
         #neopixels[basepixel] = basecolor # Set Pixel 0 to green as a starting place
         #neopixels.show()
         secondspixel=0
+        minutespixel=0
         timercolors = [GREEN, BLUE, YELLOW, PURPLE, RED]
-        for tcolor in timercolors:
-            print("Starting with color ",tcolor)
-            while True:
-                thistime=int(time.monotonic())
-                duration=thistime - lasttime
-                #print("This Time is ",thistime,"which is ",duration,"since the Last Time, which was ",lasttime)
-                if duration == 1:
-                    secondspixel = (secondspixel + 1) % NUMPIXELS
-                    print("The Seconds Pixel is ",secondspixel)
-                    neopixels[secondspixel] = tcolor
-                    neopixels.show()
-                    if secondspixel == 0:
+        for mcolor in timercolors:
+            for minutes in range(1,25):
+                for scolor in timercolors:
+                    print("Starting with color ",scolor)
+                    while True:
+                        thistime=int(time.monotonic())
+                        duration=thistime - lasttime
+                        #print("This Time is ",thistime,"which is ",duration,"since the Last Time, which was ",lasttime)
+                        if duration == 1:
+                            secondspixel = (secondspixel + 1) % ring1
+                            print("The Seconds Pixel is ",secondspixel)
+                            neopixels[secondspixel] = scolor
+                            neopixels.show()
+                            if secondspixel == 0:
+                                lasttime = thistime
+                                break
                         lasttime = thistime
+                        if not button2.value:
+                            print("Button 2 has been pressed")
+                            mode="game"
+                            button2hold()
+                            break               
+                    if mode == "game":
                         break
-                lasttime = thistime
-                if not button2.value:
-                    print("Button 2 has been pressed")
-                    mode="game"
-                    button2hold()
-                    break               
+                if mode == "game":
+                    break
+                minutespixel = (minutes % ring2) + ring1
+                print ("The Minutes Pixel is ",minutespixel)
+                neopixels[minutespixel] = mcolor
+                neopixels.show()
             if mode == "game":
                 break
         if mode == "game":
